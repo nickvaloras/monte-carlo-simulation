@@ -10,16 +10,21 @@ func MonteCarlo(trials int, ng int) float64 {
 	var wg sync.WaitGroup
 	wg.Add(ng)
 	chunk := trials / ng
+	rem := trials % ng
 
 	for i := 0; i < ng; i++ {
-		go func(n int) {
+		n := chunk
+		if i < rem { // adding the remainder to the first few goroutines
+			n++
+		}
+		go func(numTrials int) {
 			defer wg.Done()
 
-			for j := 0; j < n; j++ {
+			for j := 0; j < numTrials; j++ {
 				// simulation trial
 				// results <- value
 			}
-		}(chunk)
+		}(n)
 	}
 
 	go func() {
