@@ -2,6 +2,7 @@ package main
 
 import (
 	"sync"
+	"math/rand"
 )
 
 func MonteCarlo(trials int, ng int) float64 {
@@ -21,8 +22,15 @@ func MonteCarlo(trials int, ng int) float64 {
 			defer wg.Done()
 
 			for j := 0; j < numTrials; j++ {
-				// simulation trial
-				// results <- value
+				// portfolio starts at $100
+				value := 100.00
+				for day := 0; day < 252; day++ { 
+					// simulate 252 trading days with daily return of N(0.001, 0.02)
+						r := 0.001 + 0.02 * rand.NormFloat64()
+						value *= (1 + r)
+				}
+				// send simulated results through the channel
+				results <- value
 			}
 		}(n)
 	}
@@ -34,4 +42,6 @@ func MonteCarlo(trials int, ng int) float64 {
 
 	// aggregate results from channel
 	// compute summary statistics
+	
+	return 0.0 // temp
 }
