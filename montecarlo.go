@@ -5,6 +5,8 @@ import (
 	"math/rand"
 )
 
+// Create structure to return results as table (w/ mean, stddev, 95% CI)
+
 func MonteCarlo(trials int, ng int) float64 {
 	results := make(chan float64, trials)
 
@@ -41,7 +43,14 @@ func MonteCarlo(trials int, ng int) float64 {
 	}()
 
 	// aggregate results from channel
-	// compute summary statistics
-	
+
+	// compute mean
+
+	// compute standard deviation
+
+	// construct 95% confidence interval
+
+	// Use created table structure to return results
+
 	return 0.0 // temp
 }
