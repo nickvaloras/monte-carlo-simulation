@@ -4,6 +4,9 @@ import (
 	"sync"
 	"math/rand"
 	"math"
+	"fmt"
+	"os"
+	"strconv"
 )
 
 // Create structure to return results as table (w/ mean, stddev, 95% CI)
@@ -93,4 +96,33 @@ func MonteCarlo(trials int, ng int) Result {
 		CILow:  ciLow,
 		CIHigh: ciHigh,
 	}
+}
+
+func main() {
+	// default values
+	trials := 10000
+	workers := 4
+
+	if len(os.Args) > 1 {
+		t, err := strconv.Atoi(os.Args[1])
+		if err == nil {
+			trials = t
+		}
+	}
+
+	if len(os.Args) > 2 {
+		w, err := strconv.Atoi(os.Args[2])
+		if err == nil {
+			workers = w
+		}
+	}
+
+	result := MonteCarlo(trials, workers)
+
+	fmt.Println("Monte Carlo Simulation Results")
+	fmt.Printf("Trials: %d\n", trials)
+	fmt.Printf("Workers: %d\n", workers)
+	fmt.Printf("Mean outcome: %.2f\n", result.Mean)
+	fmt.Printf("Std dev: %.2f\n", result.StdDev)
+	fmt.Printf("95%% CI: [%.2f, %.2f]\n", result.CILow, result.CIHigh)
 }
