@@ -9,7 +9,7 @@ import (
 	"strconv"
 )
 
-// Create structure to return results as table (w/ mean, stddev, 95% CI)
+// Creates results structure for simulation
 type Result struct {
 	Mean   float64
 	StdDev float64
@@ -30,21 +30,20 @@ func MonteCarlo(trials int, ng int) Result {
 
 	for i := 0; i < ng; i++ {
 		n := chunk
-		if i < rem { // adding the remainder to the first few goroutines
+		if i < rem { 
 			n++
 		}
 		go func(numTrials int) {
 			defer wg.Done()
 
 			for j := 0; j < numTrials; j++ {
-				// portfolio starts at $100
+				// $100 starting portfolio
 				value := 100.00
 				for day := 0; day < 252; day++ { 
-					// simulate 252 trading days with daily return of N(0.001, 0.02)
+					// simulates trading days
 						r := 0.001 + 0.02 * rand.NormFloat64()
 						value *= (1 + r)
 				}
-				// send simulated results through the channel
 				results <- value
 			}
 		}(n)
@@ -55,7 +54,7 @@ func MonteCarlo(trials int, ng int) Result {
 		close(results)
 	}()
 
-	// aggregate results from channel
+	// results
 	values := make([]float64, 0, trials)
 	for v := range results {
 		values = append(values, v)
@@ -65,14 +64,14 @@ func MonteCarlo(trials int, ng int) Result {
 		return Result{}
 	}
 
-	// compute mean
+	// Computes the mean
 	var sum float64
 	for _, v := range values {
 		sum += v
 	}
 	mean := sum / n
 
-	// compute standard deviation
+	// Computes the standard deviation
 	var stdDev float64
 	if n > 1 {
 		var sqDiff float64
@@ -83,12 +82,12 @@ func MonteCarlo(trials int, ng int) Result {
 		stdDev = math.Sqrt(sqDiff / (n - 1))
 	}
 
-	// construct 95% confidence interval
+	// Constructs the 95% confidence interval
 	margin := 1.96 * (stdDev / math.Sqrt(n))
 	ciLow := mean - margin
 	ciHigh := mean + margin
 	
-	// Use created table structure to return results
+	// Returns results
 
 	return Result{
 		Mean:   mean,
