@@ -6,8 +6,14 @@ import (
 )
 
 // Create structure to return results as table (w/ mean, stddev, 95% CI)
+type Result struct {
+	Mean   float64
+	StdDev float64
+	CILow  float64
+	CIHigh float64
+}
 
-func MonteCarlo(trials int, ng int) float64 {
+func MonteCarlo(trials int, ng int) Result {
 	results := make(chan float64, trials)
 
 	var wg sync.WaitGroup
@@ -52,5 +58,10 @@ func MonteCarlo(trials int, ng int) float64 {
 
 	// Use created table structure to return results
 
-	return 0.0 // temp
+	return Result{
+		Mean:   mean,
+		StdDev: stdDev,
+		CILow:  ciLow,
+		CIHigh: ciHigh,
+	}
 }
