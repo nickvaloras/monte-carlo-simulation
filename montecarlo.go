@@ -3,6 +3,7 @@ package main
 import (
 	"sync"
 	"math/rand"
+	"math"
 )
 
 // Create structure to return results as table (w/ mean, stddev, 95% CI)
@@ -49,13 +50,32 @@ func MonteCarlo(trials int, ng int) Result {
 	}()
 
 	// aggregate results from channel
+	values := make([]float64, 0, trials)
+	for v := range results {
+		values = append(values, v)
+	}
+	n := float64(len(values))
 
 	// compute mean
+	var sum float64
+	for _, v := range values {
+		sum += v
+	}
+	mean := sum / n
 
 	// compute standard deviation
+	var sqDiff float64
+	for _, v := range values {
+		diff := v - mean
+		sqDiff += diff * diff
+	}
+	stdDev := math.Sqrt(sqDiff / (n - 1))
 
 	// construct 95% confidence interval
-
+	margin := 1.96 * (stdDev / math.Sqrt(n))
+	ciLow := mean - margin
+	ciHigh := mean + margin
+	
 	// Use created table structure to return results
 
 	return Result{
