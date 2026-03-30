@@ -15,6 +15,9 @@ type Result struct {
 }
 
 func MonteCarlo(trials int, ng int) Result {
+	if trials <= 0 || ng <= 0 {
+		return Result{}
+	}
 	results := make(chan float64, trials)
 
 	var wg sync.WaitGroup
@@ -55,6 +58,9 @@ func MonteCarlo(trials int, ng int) Result {
 		values = append(values, v)
 	}
 	n := float64(len(values))
+	if n == 0 {
+		return Result{}
+	}
 
 	// compute mean
 	var sum float64
@@ -64,12 +70,15 @@ func MonteCarlo(trials int, ng int) Result {
 	mean := sum / n
 
 	// compute standard deviation
-	var sqDiff float64
-	for _, v := range values {
-		diff := v - mean
-		sqDiff += diff * diff
+	var stdDev float64
+	if n > 1 {
+		var sqDiff float64
+		for _, v := range values {
+			diff := v - mean
+			sqDiff += diff * diff
+		}
+		stdDev = math.Sqrt(sqDiff / (n - 1))
 	}
-	stdDev := math.Sqrt(sqDiff / (n - 1))
 
 	// construct 95% confidence interval
 	margin := 1.96 * (stdDev / math.Sqrt(n))
